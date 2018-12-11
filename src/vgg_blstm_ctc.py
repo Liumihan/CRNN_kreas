@@ -1,5 +1,6 @@
 import keras
-from keras.layers import Lambda, Dense, Bidirectional, GRU, Flatten, TimeDistributed, Permute, Activation, Input, Reshape, Conv2D, MaxPooling2D, BatchNormalization, ZeroPadding2D
+from keras.layers import Lambda, Dense, Bidirectional, GRU, Flatten, TimeDistributed, Permute, Activation, Input
+from keras.layers import LSTM, Reshape, Conv2D, MaxPooling2D, BatchNormalization, ZeroPadding2D
 from keras import backend as K
 import numpy as np
 import os
@@ -7,9 +8,10 @@ import tensorflow as tf
 from data_generator import *
 from utils import ctc_loss_layer
 
-def CRNN_model(is_training):
+def model(is_training):
 
-    initializer = keras.initializers.he_normal()
+    # initializer = keras.initializers.he_normal()
+    initializer = keras.initializers.glorot_uniform()
     max_label_length = 12
 
 
@@ -48,9 +50,9 @@ def CRNN_model(is_training):
     rnn_output = TimeDistributed(Flatten(), name='for_flatten_by_time')(rnn_input) # 32*512
 
     # RNN part
-    y = Bidirectional(GRU(256, return_sequences=True), name='GRU_1')(rnn_output) # 32*512
+    y = Bidirectional(LSTM(256, return_sequences=True), name='LSTM_1')(rnn_output) # 32*512
     y = BatchNormalization(name='BN_3')(y)
-    y = Bidirectional(GRU(256, return_sequences=True), name='GRU_2')(y) # 32*512
+    y = Bidirectional(LSTM(256, return_sequences=True), name='LSTM_2')(y) # 32*512
 
                                                                         # 尝试跳过rnn层
     y_pred = Dense(11, activation='softmax', name='y_pred')(y) # 32*11 这用来做evaluation 和 之后的test检测

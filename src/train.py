@@ -1,4 +1,3 @@
-from network import CRNN_model
 from utils import fake_ctc_loss
 import keras
 import os
@@ -12,7 +11,8 @@ def train_model(model, train_data_dir, val_data_dir, save_path, img_size=(128,32
     #callbacks  
     save_model_cbk = keras.callbacks.ModelCheckpoint(model_save_path, save_best_only=True)
     save_weights_cbk = keras.callbacks.ModelCheckpoint(weight_save_path, save_best_only=True, save_weights_only=True)
-    early_stop_cbk = keras.callbacks.EarlyStopping(patience=10)
+    early_stop_cbk = keras.callbacks.EarlyStopping(patience=5)
+    reduce_lr_cbk = keras.callbacks.ReduceLROnPlateau(patience=5)
     
     # compile
     model.compile(optimizer='adam', loss={'ctc_loss_output': fake_ctc_loss})
@@ -31,8 +31,8 @@ def train_model(model, train_data_dir, val_data_dir, save_path, img_size=(128,32
 
 
 def main():
-    model_for_train = CRNN_model(is_training=True)
-    model_for_predict = CRNN_model(is_training=False)
+    # model_for_train = CRNN_model(is_training=True)
+    # model_for_predict = CRNN_model(is_training=False)
     im_size = (128, 32) # W*H
     current_time = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(time.time()))
     model_save_path = "../model/" + current_time + "_best_model.h5"
@@ -46,7 +46,7 @@ def main():
     train_model(model_for_train, train_data_path, val_data_path, save_path, (128, 32))
 
     # weight_save_path = "../model/weights/2018_12_09_20_45_26_best_weight.h5"
-    predict_label = PredictLabels(model_for_predict, weight_save_path, data_dir_for_predict, im_size)
+    # predict_label = PredictLabels(model_for_predict, weight_save_path, data_dir_for_predict, im_size)
 
     result_txt = open(test_result_save_path, 'w')
     for key, value in predict_label.items():
