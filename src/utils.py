@@ -1,6 +1,41 @@
 import os
 import cv2
 import numpy as np
+from keras import backend as K
+
+def ctc_loss_layer(args):
+    '''
+    输入：args = (y_true, y_pred, pred_length, label_length)
+    y_true, y_pred分别是预测的标签和真实的标签
+    shape分别是（batch_size，max_label_length)和(batch_size, time_steps, num_categories)
+    perd_length, label_length分别是保存了每一个样本所对应的预测标签长度和真实标签长度
+    shape分别是（batch_size, 1)和(batch_size, 1)
+    输出：
+    batch_cost 每一个样本所对应的loss
+    shape是（batch_size, 1)
+    '''
+    y_true, y_pred, pred_length, label_length = args
+    # y_pred = y_pred[:, 2:, :]
+    batch_cost = K.ctc_batch_cost(y_true, y_pred, pred_length, label_length)
+    return batch_cost
+
+
+def fake_ctc_loss(y_true, y_pred):
+    '''
+    这个函数是为了符合keras comepile的要求入口参数只能有y_true和y_pred
+    之后在结合我们的ctc_loss_layer一起工作
+    '''
+    return y_pred
+
+def check_acc(predict_labels):
+    acc = 0
+    for gt, pre in predict_labels.items():
+        if gt.split("_")[0] == pre:
+            acc += 1
+    acc /= len(predict_labels)
+    return acc
+
+
 def find_the_inner_dot(dir_path):
     img_list = os.listdir(dir_path)
     for img in img_list:
@@ -25,39 +60,6 @@ def closure(img):
     # gau_kernel_size = (5,5)
     # dil_kernel = (5,5)
     sigma = 1.5  
-    # # erosion = cv2.erode(img,kernel,iterations = 1)
-    # cv2.imshow("before", img)
-    
-    # gau = cv2.GaussianBlur(img, gau_kernel_size, sigma)
-    # dilation = cv2.dilate(img,dil_kernel,iterations = 1)
-    # closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, closing_kernel)
-    # opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, opening_kernel)
-
-
-    # gau_closing = cv2.morphologyEx(gau, cv2.MORPH_CLOSE, closing_kernel)
-    # gau_dilation = cv2.dilate(gau,dil_kernel,iterations = 1)
-    # closing_gau = cv2.GaussianBlur(closing, gau_kernel_size, sigma)
-
-    # max_gau_closing = np.where(gau_closing < 200, np.zeros(gau_closing.shape), np.ones(gau_closing.shape)*255)
-    
-    # cv2.imshow("opening", opening)
-    # cv2.imshow("max_gau_closing", max_gau_closing)
-    # cv2.imshow("gau_dilation", gau_dilation)
-    # cv2.imshow("gau_closing", gau_closing)
-    # cv2.imshow("gau", gau)
-    # cv2.imshow("dilation", dilation)
-    # cv2.imshow("closing", closing)
-    # cv2.imshow("closing_gau", closing_gau)
-
-    # cv2.moveWindow("before", 0,0)
-    # cv2.moveWindow("gau", 0, 200)
-    # cv2.moveWindow("dilation", 0, 400)
-    # cv2.moveWindow("closing", 0, 600)
-    # cv2.moveWindow("max_gau_closing", 0, 800)
-    # cv2.moveWindow("gau_dilation", 400, 0)
-    # cv2.moveWindow("gau_closing", 800, 0)
-    # cv2.moveWindow("closing_gau", 400, 200)
-    # cv2.moveWindow("opening", 400, 400)
     cv2.imshow("before", img)
     cv2.moveWindow("before", 900, 1200)
     for ga in range(3, 8, 2):
@@ -71,6 +73,8 @@ def closure(img):
             cv2.moveWindow("max_gau_closing_ga{}_cl{}".format(ga, cl), (ga-3)*200, (cl-3)*200)
     cv2.waitKey(0) 
     return 0
+
+
 
 if __name__ == "__main__":
     # find_the_inner_dot("../data/numbers_training")

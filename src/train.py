@@ -1,24 +1,21 @@
-from network import *
+from network import CRNN_model
+from utils import fake_ctc_loss
 import keras
 import os
 import cv2
 import time
+from data_generator import DataGenerator
 
-def train_model(model, train_data_dir, val_data_dir, save_path, img_size, batch_size=128, max_label_length=12, down_sample_factor=4, epochs=100):
+def train_model(model, train_data_dir, val_data_dir, save_path, img_size=(128,32), batch_size=128, max_label_length=12, down_sample_factor=4, epochs=100):
     print("Training start!")
     model_save_path, weight_save_path = save_path
-    img_w, img_h = img_size
-    # down_sample_factor = 4
-    # batch_size = 128
-    # val_batch_size = 32
-    # max_label_length = 12
     #callbacks  
     save_model_cbk = keras.callbacks.ModelCheckpoint(model_save_path, save_best_only=True)
     save_weights_cbk = keras.callbacks.ModelCheckpoint(weight_save_path, save_best_only=True, save_weights_only=True)
     early_stop_cbk = keras.callbacks.EarlyStopping(patience=10)
     
     # compile
-    model.compile(optimizer='adam', loss={'ctc_loss_output': m_fake_ctc_loss})
+    model.compile(optimizer='adam', loss={'ctc_loss_output': fake_ctc_loss})
     # fit_generator
     train_gen = DataGenerator(train_data_dir, img_size, down_sample_factor, batch_size, max_label_length)
     val_gen = DataGenerator(val_data_dir, img_size, down_sample_factor, batch_size, max_label_length)
@@ -49,7 +46,7 @@ def main():
     train_model(model_for_train, train_data_path, val_data_path, save_path, (128, 32))
 
     # weight_save_path = "../model/weights/2018_12_09_20_45_26_best_weight.h5"
-    predict_label = PredictLabel(model_for_predict, weight_save_path, data_dir_for_predict, im_size)
+    predict_label = PredictLabels(model_for_predict, weight_save_path, data_dir_for_predict, im_size)
 
     result_txt = open(test_result_save_path, 'w')
     for key, value in predict_label.items():

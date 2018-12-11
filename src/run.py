@@ -2,6 +2,7 @@ from network import CRNN_model
 from data_generator import DataGenerator
 from train import train_model
 from predict import PredictLabel, PredictLabels
+from utils import check_acc
 import keras
 import numpy as np
 import time
@@ -27,20 +28,16 @@ def main():
     save_path = (model_save_path, weight_save_path)
     
     # 训练模型
-    train_model(model_for_train, train_data_path, val_data_path, save_path, img_size, epochs=epochs)
+    train_model(model_for_train, train_data_path, val_data_path, save_path, epochs=epochs, 
+            img_size=img_size, batch_size=128, max_label_length=12,down_sample_factor=4)
 
     # 使用训练好的模型进行预测
     # predict_label = PredictLabel(model_for_predict, weight_save_path, data_dir_for_predict, img_size, downsample_factor)
     predict_labels = PredictLabels(model_for_predict, weight_save_path, data_dir_for_predict, img_size, downsample_factor, batch_size=128)
 
     # check accuracy
-    acc = 0
-    for gt, pre in predict_labels.items():
-        if gt.split("_")[0] == pre:
-            acc += 1
-    acc /= len(predict_labels)
+    acc = check_acc(predict_labels)
     print("accuracy on the on the val_data is {}.".format(acc))
-
     # 保存预测的结果
     test_result_save_path = "../data/result/" + current_time + "acc:{:.2f}".format(acc) + "_result.txt"
     result_txt = open(test_result_save_path, 'w')

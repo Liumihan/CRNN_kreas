@@ -25,10 +25,6 @@ class DataGenerator:
                 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 gray_img = cv2.resize(gray_img, (self.img_w, self.img_h))
                 gray_img = gray_img.astype(np.float32)
-                # gau_closing_max 化
-                # gau = cv2.GaussianBlur(gray_img, (3, 3), 1.5)
-                # gau_closing = cv2.morphologyEx(gau, cv2.MORPH_CLOSE, (5, 5))
-                # max_gau_closing = np.where(gau_closing < 240, np.zeros(gau_closing.shape), np.ones(gau_closing.shape)*255)
 
                 data.append(gray_img)
                 str_label = img_file.split('_')[0]
