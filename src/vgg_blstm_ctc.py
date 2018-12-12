@@ -19,30 +19,23 @@ def model(is_training):
     picture_height = 32
     #CNN part
     inputs = Input(shape=(picture_height, picture_width, 1), name='pic_inputs') # H×W×1 32*128*1
-    x = Conv2D(64, (3,3), strides=(1,1), padding="same", activation='relu',
-                kernel_initializer=initializer, use_bias=True, name='conv2d_1')(inputs) # 32*128*64 
+    x = Conv2D(64, (3,3), strides=(1,1), padding="same", activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_1')(inputs) # 32*128*64 
     x = MaxPooling2D(pool_size=(2,2), strides=2, padding='valid', name='maxpl_1')(x) # 16*64*64
 
-    x = Conv2D(128, (3,3), strides=(1,1), padding="same", activation='relu', # 16*64*128
-                kernel_initializer=initializer, use_bias=True, name='conv2d_2')(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding="same", activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_2')(x) # 16*64*128
     x = MaxPooling2D(pool_size=(2,2), strides=2, padding='valid', name='maxpl_2')(x) # 8*32*128
     
-    x = Conv2D(256, (3,3), strides=(1,1), padding="same", activation='relu', # 8*32*256
-                kernel_initializer=initializer, use_bias=True, name='conv2d_3')(x) 
-    x = Conv2D(256, (3,3), strides=(1,1), padding="same", activation='relu', # 8*32*256
-                kernel_initializer=initializer, use_bias=True, name='conv2d_4')(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding="same", activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_3')(x)  # 8*32*256
+    x = Conv2D(256, (3,3), strides=(1,1), padding="same", activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_4')(x) # 8*32*256
     x = MaxPooling2D(pool_size=(2,1), strides=(2,1), name='maxpl_3')(x) # 4*32*256
-    x = Conv2D(512, (3,3), strides=(1,1), padding="same", # 4*32*512
-                kernel_initializer=initializer, use_bias=True, name='conv2d_5')(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding="same", kernel_initializer=initializer, use_bias=True, name='conv2d_5')(x) # 4*32*512
     x = BatchNormalization(axis=-1, name='BN_1')(x)
     x = Activation("relu", name='relu_1')(x)
-    x = Conv2D(512, (3,3), strides=(1,1), padding="same", # 4*32*512
-                kernel_initializer=initializer, use_bias=True, name='conv2d_6')(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding="same", kernel_initializer=initializer, use_bias=True, name='conv2d_6')(x) # 4*32*512
     x = BatchNormalization(axis=-1, name='BN_2')(x)
     x = Activation("relu", name='relu_2')(x)
     x = MaxPooling2D(pool_size=(2,1), strides=(2,1), name='maxpl_4')(x) # 2*32*512
-    x = Conv2D(512, (2,2), strides=(1,1), padding='same', # 2*32*512
-                activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_7')(x)
+    x = Conv2D(512, (2,2), strides=(1,1), padding='same', activation='relu', kernel_initializer=initializer, use_bias=True, name='conv2d_7')(x) # 2*32*512
     conv_otput = MaxPooling2D(pool_size=(2, 1), name="conv_output")(x) # 1*32*512
     
     # Map2Sequence part

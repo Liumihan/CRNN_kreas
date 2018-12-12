@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/home/liumihan/anaconda3/envs/tensorflow/bin/python"
+    "python.pythonPath": "/home/liumihan/anaconda3/envs/tensorflow/bin/python",
+    "git.ignoreLimitWarning": true
 }

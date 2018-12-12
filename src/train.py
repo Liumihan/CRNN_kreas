@@ -11,7 +11,7 @@ def train_model(model, train_data_dir, val_data_dir, save_path, img_size=(128,32
     #callbacks  
     save_model_cbk = keras.callbacks.ModelCheckpoint(model_save_path, save_best_only=True)
     save_weights_cbk = keras.callbacks.ModelCheckpoint(weight_save_path, save_best_only=True, save_weights_only=True)
-    early_stop_cbk = keras.callbacks.EarlyStopping(patience=5)
+    early_stop_cbk = keras.callbacks.EarlyStopping(patience=10)
     reduce_lr_cbk = keras.callbacks.ReduceLROnPlateau(patience=5)
     
     # compile

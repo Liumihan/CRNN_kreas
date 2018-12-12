@@ -7,6 +7,7 @@ import numpy as np
 import time
 import vgg_blstm_ctc
 import vgg_bgru_ctc
+import resnet_bgru_ctc
 
 def main():
     
@@ -15,8 +16,11 @@ def main():
     # model_for_train = vgg_bgru_ctc.model(is_training=True)
     # model_for_predict = vgg_bgru_ctc.model(is_training=False)
     # vgg_blstm_ctc
-    model_for_train = vgg_blstm_ctc.model(is_training=True)
-    model_for_predict = vgg_blstm_ctc.model(is_training=False)
+    # model_for_train = vgg_blstm_ctc.model(is_training=True)
+    # model_for_predict = vgg_blstm_ctc.model(is_training=False)
+    # resnet_blstm_ctc
+    model_for_train = resnet_bgru_ctc.model(is_training=True)
+    model_for_predict = resnet_bgru_ctc.model(is_training=False)
     # 各种训练时候的参数
     img_size = (128, 32) # W*H
     downsample_factor = 4
