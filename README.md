@@ -10,16 +10,16 @@
 
 #### File Description
 
-- [ ] > | File               | Description                |
-  > | ------------------ | -------------------------- |
-  > | vgg_bgru_ctc.py    | 网络模型文件               |
-  > | vgg_blstm_ctc.py   | 网络模型文件               |
-  > | resnet_bgru_ctc.py | 网络模型文件               |
-  > | train.py           | 训练函数                   |
-  > | predicts.py        | 预测函数                   |
-  > | data_generator.py  | 数据生成函数，节省内存空间 |
-  > | dicts.py           | 字符字典                   |
-  > | utils.py           | 辅助函数                   |
+| File               | Description                |
+| ------------------ | -------------------------- |
+| vgg_bgru_ctc.py    | 网络模型文件               |
+| vgg_blstm_ctc.py   | 网络模型文件               |
+| resnet_bgru_ctc.py | 网络模型文件               |
+| train.py           | 训练函数                   |
+| predicts.py        | 预测函数                   |
+| data_generator.py  | 数据生成函数，节省内存空间 |
+| dicts.py           | 字符字典                   |
+| utils.py           | 辅助函数                   |
 
 
 
