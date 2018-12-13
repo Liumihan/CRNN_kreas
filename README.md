@@ -4,7 +4,7 @@
 
 这是一个基于CRNN的文本序列识别项目，目前正在测试数字串的识别。之后会加入更多的文字识别。
 
-其中src文件夹下面存储的是源码，data下面存储的是数据。
+其中src文件夹下面存储的是源码，data下面存储的是数据，predicted_results下面存的是当前在测试集上面的测试结果。
 
 持续更新中。。。
 
@@ -45,7 +45,7 @@ https://distill.pub/2017/ctc/
 
 https://towardsdatascience.com/intuitively-understanding-connectionist-temporal-classification-3797e43a86c
 
-git：
+##### git：
 
 https://github.com/Liumihan/CRNN-Keras
 
