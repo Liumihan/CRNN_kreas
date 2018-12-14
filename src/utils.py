@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 from keras import backend as K
+from dicts import char2num_dict, num2char_dict
 
 def ctc_loss_layer(args):
     '''
@@ -29,11 +30,14 @@ def fake_ctc_loss(y_true, y_pred):
 
 def check_acc(predict_labels):
     acc = 0
+    misclassified = {}
     for gt, pre in predict_labels.items():
         if gt.split("_")[0] == pre:
             acc += 1
+        else: 
+            misclassified[gt] = pre
     acc /= len(predict_labels)
-    return acc
+    return acc, misclassified
 
 
 def find_the_inner_dot(dir_path):
@@ -43,6 +47,8 @@ def find_the_inner_dot(dir_path):
             if img[i] == '.' and img[i+1] != 'j':
                 print(img)
                 continue
+
+
 def find_the_max_label_length(dir_path):
     max_label_length = 0
     img_list = os.listdir(dir_path)
@@ -52,8 +58,8 @@ def find_the_max_label_length(dir_path):
             max_label_length = len(label)
     print("max_label_length: ", max_label_length)
     return max_label_length
-def closure(img):
 
+def closure(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # opening_kernel = (5,5)
     # closing_kernel = (5,5)
@@ -74,10 +80,32 @@ def closure(img):
     cv2.waitKey(0) 
     return 0
 
+def generate_trainfile(data_dir_path, save_file_path):
+    '''
+    生成类似 300w+的那个数据集类似的txt文件
+    保存格式： 图片文件名.jpg<空格>对应标签
+    '''
+    img_path_list = os.listdir(data_dir_path)
+    target_file = open(save_file_path, "a")
+    for img_filename in img_path_list:
+        gt = img_filename.split("_")[0]
+        gt_nums = [char2num_dict[ch] for ch in gt] # 转换成对应的数字标签 
+        target_file.write(img_filename)
+        for num in gt_nums:
+            target_file.write(" " + str(num)) # 在每两个数字之间增加一个空格
+        target_file.write("\n") # 末尾换行
+    target_file.close()
+    return 0
 
+def main():
+    generate_trainfile("../data/numbers_val_croped", "../data/data_txt/val.txt")
+
+    return 0
 
 if __name__ == "__main__":
     # find_the_inner_dot("../data/numbers_training")
     # find_the_max_label_length("../data/numbers_training")
-    img = cv2.imread("../data/numbers_training_croped/30065864_20071.jpg")
-    closure(img)
+    # img = cv2.imread("../data/numbers_training_croped/30065864_20071.jpg")
+    # closure(img)
+    # a = find_the_inner_dot("../data/numbers_val_croped")
+    main()
