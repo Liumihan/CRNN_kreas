@@ -39,6 +39,27 @@ def check_acc(predict_labels):
     acc /= len(predict_labels)
     return acc, misclassified
 
+def check_acc_txt(predict_labels, txt_file_path):
+    acc = 0
+    misclassified = {}
+    data_txt = open(txt_file_path, "r")
+    data_txt_list = data_txt.readlines()
+    ground_truthes = {}
+    for line in data_txt_list:
+        img_name = line.split(" ")[0]
+        true_label = ""
+        for ch in line.split("\n")[0].split(" ")[1:]:
+            true_label += num2char_dict[int(ch)]
+        ground_truthes[img_name] = true_label
+
+    for img_name, pre in predict_labels.items():
+        if pre == ground_truthes[img_name]:
+            acc += 1
+        else: 
+            misclassified[img_name] = pre
+    acc /= len(predict_labels)
+    data_txt.close()
+    return acc, misclassified
 
 def find_the_inner_dot(dir_path):
     img_list = os.listdir(dir_path)
@@ -98,8 +119,13 @@ def generate_trainfile(data_dir_path, save_file_path):
     return 0
 
 def main():
-    generate_trainfile("../data/numbers_val_croped", "../data/data_txt/val.txt")
-
+    # generate_trainfile("../data/numbers_training_croped", "../data/data_txt/train.txt")
+    val_txt = open("../data/data_txt/val.txt", "r")
+    val_txt_list =  val_txt.readlines()[:32]
+    val_img_names = [line.split(" ")[0] for line in val_txt_list]
+    val_img_labels_chars = [line.split("\n")[0].split(" ")[1:] for line in val_txt_list ] # 第一个split是为了去掉末尾的"\n" 第二个是为了去掉空格 现在里面存的是字符数组
+    val_img_labels_nums = [] # 现在将他转换成数字数组
+    val_txt.close()
     return 0
 
 if __name__ == "__main__":
