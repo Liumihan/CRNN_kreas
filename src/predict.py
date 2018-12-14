@@ -5,53 +5,15 @@ import os
 from data_generator import DataGenerator
 from dicts import num2char_dict, char2num_dict
 
-
-# 每次一个图片来做predict
-def PredictLabel(model_for_pre, weight_path, test_data_dir, img_size, downsample_factor):
-    img_w, img_h = img_size
-    img_path_list = os.listdir(test_data_dir)
-    num_images = len(img_path_list)
-    model_for_pre.load_weights(weight_path, by_name=True) # by_name = True 表示只取前面一部分的权重
-    predict_label = {}
-    print("start predicting! There are total {} images!".format(len(img_path_list)))
-    for img_path in img_path_list:
-        print("Predicting image {0}. {1} images left!".format(img_path, num_images))
-        img = cv2.imread(os.path.join(test_data_dir, img_path))
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        # gau = cv2.GaussianBlur(gray_img, (3, 3), 1.5)
-        # gau_closing = cv2.morphologyEx(gau, cv2.MORPH_CLOSE, (5, 5))
-        # max_gau_closing = np.where(gau_closing < 240, np.zeros(gau_closing.shape), np.ones(gau_closing.shape)*255)
-
-        gray_img = cv2.resize(gray_img, (img_w, img_h))
-
-        gray_img = np.expand_dims(gray_img, axis=-1)
-        gray_img = np.expand_dims(gray_img, axis=0)
-
-        gray_img = gray_img / 255.0 * 2.0 - 1.0 # 零中心化
-        
-        y_pred = model_for_pre.predict(gray_img)
-        y_pred_argmax = np.argmax(y_pred, axis=-1)
-        y_pred_length = np.full((1,), int(img_w//downsample_factor))
-        # 解码阶段
-        y_pred_label_tensor_list, _ = keras.backend.ctc_decode(y_pred, y_pred_length, greedy=True)
-        y_pred_label_tensor = y_pred_label_tensor_list[0]
-        y_pred_label = keras.backend.get_value(y_pred_label_tensor)
-        predict_label[img_path] = (y_pred_label, y_pred_argmax)
-
-        num_images -= 1
-    
-    return predict_label
-
-
 # 一次多个图片一起预测
-def PredictLabels(model_for_pre, weight_path, test_data_dir, img_size, downsample_factor, batch_size=64):
+def PredictLabels(model_for_pre, test_data_dir, img_size, downsample_factor, batch_size=64, weight_path=None):
     img_w, img_h = img_size
     img_path_list = os.listdir(test_data_dir)
     # img_path_list = img_path_list[0: 10]
     num_images = len(img_path_list)
     counter = num_images
-    model_for_pre.load_weights(weight_path, by_name=True) # by_name = True 表示按名字，只取前面一部分的权重
+    if weight_path is not None: # 表明传入的是一个空壳，需要加载权重参数
+        model_for_pre.load_weights(weight_path, by_name=True) # by_name = True 表示按名字，只取前面一部分的权重
     predicted_labels = {}
     print("Predicting Start!")
     # 将数据装入
@@ -74,7 +36,7 @@ def PredictLabels(model_for_pre, weight_path, test_data_dir, img_size, downsampl
         y_pred_length = np.full((l_ipb,), int(img_w//downsample_factor))
 
         # Decode 阶段 
-        y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True)
+        y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True) # 使用的是最简单的贪婪算法
         y_pred_labels_tensor = y_pred_labels_tensor_list[0]
         y_pred_labels = keras.backend.get_value(y_pred_labels_tensor) # 现在还是字符编码
         # 转换成字符串
