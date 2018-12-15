@@ -8,14 +8,14 @@ import tensorflow as tf
 from data_generator import *
 from utils import ctc_loss_layer
 
-def model(is_training):
+def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12):
 
     initializer = keras.initializers.he_normal()
     max_label_length = 12
 
     num_classes = 11
-    picture_width = 128
-    picture_height = 32
+    picture_width, picture_height = img_size
+
     #CNN part
     inputs = Input(shape=(picture_height, picture_width, 1), name='pic_inputs') # H×W×1 32*128*1
     x = Conv2D(64, (3,3), strides=(1,1), padding="same", kernel_initializer=initializer, use_bias=True, name='conv2d_1')(inputs) # 32*128*64 

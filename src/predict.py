@@ -5,21 +5,28 @@ import os
 from data_generator import DataGenerator
 from dicts import num2char_dict, char2num_dict
 
-# 一次多个图片一起预测
-def PredictLabels(model_for_pre, test_data_dir, img_size, downsample_factor, batch_size=64, weight_path=None):
+# 使用txt文本的方式读取数据
+def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsample_factor, batch_size=64, weight_path=None):
     img_w, img_h = img_size
     img_path_list = os.listdir(test_data_dir)
-    # img_path_list = img_path_list[0: 10]
+    # 通过txt文件获取文件名
+    data_txt = open(test_txt_path, "r")
+    data_txt_list = data_txt.readlines()
+    img_path_list = [line.split(" ")[0] for line in data_txt_list] # 所有的图片的文件名
+    data_txt.close()
     num_images = len(img_path_list)
+    
     counter = num_images
+    
     if weight_path is not None: # 表明传入的是一个空壳，需要加载权重参数
         model_for_pre.load_weights(weight_path, by_name=True) # by_name = True 表示按名字，只取前面一部分的权重
+
     predicted_labels = {}
     print("Predicting Start!")
     # 将数据装入
     for idx in range(0, num_images, batch_size):
         img_path_batch = img_path_list[idx:idx+batch_size]
-        l_ipb = len(img_path_batch)
+        l_ipb = len(img_path_batch) # 之所以不用batch_size是因为最后一个批次的数量可能小于batch_size
         img_batch = np.zeros((l_ipb, img_h, img_w, 1))
         # 将一个batch的图片装入内存 并进行处理
         print("There are {} images left.".format(counter))
@@ -49,33 +56,24 @@ def PredictLabels(model_for_pre, test_data_dir, img_size, downsample_factor, bat
         for j in range(len(img_path_batch)):
             predicted_labels[img_path_batch[j]] = y_pred_text[j]
         counter -= batch_size
-
     print("Predict Finished!")
     return predicted_labels
-
-
-# 使用txt文本的方式读取数据
-def PredictLabels_txt(model_for_pre, test_data_dir, test_txt_path, img_size, downsample_factor, batch_size=64, weight_path=None):
+    
+# 一次多个图片一起预测
+def PredictLabels_by_filename(model_for_pre, test_data_dir, img_size, downsample_factor, batch_size=64, weight_path=None):
     img_w, img_h = img_size
     img_path_list = os.listdir(test_data_dir)
-    # 通过txt文件获取文件名
-    data_txt = open(test_txt_path, "r")
-    data_txt_list = data_txt.readlines()
-    img_path_list = [line.split(" ")[0] for line in data_txt_list] # 所有的图片的文件名
-    data_txt.close()
+    # img_path_list = img_path_list[0: 10]
     num_images = len(img_path_list)
-    
     counter = num_images
-    
     if weight_path is not None: # 表明传入的是一个空壳，需要加载权重参数
         model_for_pre.load_weights(weight_path, by_name=True) # by_name = True 表示按名字，只取前面一部分的权重
-
     predicted_labels = {}
     print("Predicting Start!")
     # 将数据装入
     for idx in range(0, num_images, batch_size):
         img_path_batch = img_path_list[idx:idx+batch_size]
-        l_ipb = len(img_path_batch) # 之所以不用batch_size是因为最后一个批次的数量可能小于batch_size
+        l_ipb = len(img_path_batch)
         img_batch = np.zeros((l_ipb, img_h, img_w, 1))
         # 将一个batch的图片装入内存 并进行处理
         print("There are {} images left.".format(counter))

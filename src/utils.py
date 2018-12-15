@@ -28,7 +28,7 @@ def fake_ctc_loss(y_true, y_pred):
     '''
     return y_pred
 
-def check_acc(predict_labels):
+def check_acc_by_filename(predict_labels):
     acc = 0
     misclassified = {}
     for gt, pre in predict_labels.items():
@@ -39,7 +39,7 @@ def check_acc(predict_labels):
     acc /= len(predict_labels)
     return acc, misclassified
 
-def check_acc_txt(predict_labels, txt_file_path):
+def check_acc(predict_labels, txt_file_path):
     acc = 0
     misclassified = {}
     data_txt = open(txt_file_path, "r")
@@ -117,6 +117,7 @@ def generate_trainfile(data_dir_path, save_file_path):
         target_file.write("\n") # 末尾换行
     target_file.close()
     return 0
+
 
 def main():
     # generate_trainfile("../data/numbers_training_croped", "../data/data_txt/train.txt")

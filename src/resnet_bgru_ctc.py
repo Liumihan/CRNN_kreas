@@ -62,12 +62,11 @@ def identity_block(input_tensor, filters, place):
     return out
 
 
-def model(is_training): # resnet-50 简化版
+def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12): # resnet-50 简化版
     initializer = keras.initializers.he_normal()
     regularizer = keras.regularizers.l2(0)
     max_label_length = 12
-    picture_width = 128
-    picture_height = 32
+    picture_width, picture_height = img_size
     place = [0]
     
     inputs = Input(shape=(picture_height, picture_width, 1), name='pic_inputs') # 32*128*1
@@ -111,8 +110,9 @@ def model(is_training): # resnet-50 简化版
 
     # RNN
     y = Bidirectional(GRU(256, return_sequences=True), name="BGRU_1")(time_stamps) # 32*2048
+    y = BatchNormalization(name="BN_GRU")(y)
     y = Bidirectional(GRU(256, return_sequences=True), name="BGRU_2")(y) # 32*2048    
-    y_pred = Dense(11, activation="softmax", name='y_pred')(y) # 32*11
+    y_pred = Dense(num_classes, activation="softmax", name='y_pred')(y) # 32*11
 
     # Transcription part (CTC_loss part)
     y_true = Input(shape=[max_label_length], name='y_true')
