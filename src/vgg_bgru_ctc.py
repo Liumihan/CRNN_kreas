@@ -71,6 +71,3 @@ def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12
         return full_model
     else:
         return base_model
-
-
-

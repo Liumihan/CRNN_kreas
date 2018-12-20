@@ -8,12 +8,9 @@ import tensorflow as tf
 from data_generator import *
 from utils import ctc_loss_layer
 
-def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12):
+def model(is_training=True, img_size=(280, 32), num_classes = 5991, max_label_length=10):
 
     initializer = keras.initializers.he_normal()
-    max_label_length = 12
-
-    num_classes = 11
     picture_width, picture_height = img_size
 
     #CNN part
@@ -54,7 +51,7 @@ def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12
     rnn_input = TimeDistributed(Flatten(), name='for_flatten_by_time')(x) # 32*512
 
     # RNN part
-    y = Bidirectional(LSTM(256, kernel_initializer=initializer, return_sequences=True), name='LSTM_1')(rnn_input) # 32*512
+    y = Bidirectional(LSTM(256, kernel_initializer=initializer, return_sequences=True), merge_mode='sum', name='LSTM_1')(rnn_input) # 32*512
     y = BatchNormalization(name='BN_8')(y)
     y = Bidirectional(LSTM(256, kernel_initializer=initializer, return_sequences=True), name='LSTM_2')(y) # 32*512
 
@@ -80,6 +77,15 @@ def model(is_training, img_size=(128, 32), num_classes = 11, max_label_length=12
         return model
     else:
         return base_model
+
+
+def main():
+    model()
+    return 0
+
+if __name__ == '__main__':
+    main()
+    
 
 
 

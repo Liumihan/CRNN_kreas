@@ -13,6 +13,8 @@ def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsam
     data_txt = open(test_txt_path, "r")
     data_txt_list = data_txt.readlines()
     img_path_list = [line.split(" ")[0] for line in data_txt_list] # 所有的图片的文件名
+
+    # img_path_list = img_path_list[4000:6000]
     data_txt.close()
     num_images = len(img_path_list)
     
