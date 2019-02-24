@@ -2,9 +2,9 @@ import keras
 import cv2
 import numpy as np
 import os
+from data_generator import DataGenerator
 from dicts import num2char_dict, char2num_dict
-import gc
-import itertools
+
 # 使用txt文本的方式读取数据
 def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsample_factor, batch_size=64, weight_path=None):
     img_w, img_h = img_size
@@ -13,7 +13,6 @@ def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsam
     data_txt = open(test_txt_path, "r")
     data_txt_list = data_txt.readlines()
     img_path_list = [line.split(" ")[0] for line in data_txt_list] # 所有的图片的文件名
-
     data_txt.close()
     num_images = len(img_path_list)
     
@@ -42,12 +41,11 @@ def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsam
         # 传输进base_net获得预测的softmax后验概率矩阵
         y_pred_probMatrix = model_for_pre.predict(img_batch)
         y_pred_length = np.full((l_ipb,), int(img_w//downsample_factor))
-        y_pred_labels = decode_the_porb(y_pred_probMatrix, 10)
-        # # Decode 阶段 
-        # y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True) # 使用的是最简单的贪婪算法
-        # y_pred_labels_tensor = y_pred_labels_tensor_list[0]
-        # y_pred_labels = keras.backend.get_value(y_pred_labels_tensor) # 现在还是字符编码
 
+        # Decode 阶段 
+        y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True) # 使用的是最简单的贪婪算法
+        y_pred_labels_tensor = y_pred_labels_tensor_list[0]
+        y_pred_labels = keras.backend.get_value(y_pred_labels_tensor) # 现在还是字符编码
         # 转换成字符串
         y_pred_text = ["" for _ in range(l_ipb)]
         for k in range(l_ipb):
@@ -60,17 +58,6 @@ def PredictLabels(model_for_pre, test_data_dir, test_txt_path, img_size, downsam
         counter -= batch_size
     print("Predict Finished!")
     return predicted_labels
-
-def decode_the_porb(probMatrix, max_label_length):
-    y_pred_labels = []
-    for pre in probMatrix: # 单个单个进行处理
-        y_pred_label = list(np.argmax(pre, axis=-1))
-        y_pred_label = [k for k, g in itertools.groupby(y_pred_label)]
-        while 5990 in y_pred_label:
-            y_pred_label.remove(5990)
-        y_pred_labels.append(y_pred_label)
-                
-    return y_pred_labels
     
 # 一次多个图片一起预测
 def PredictLabels_by_filename(model_for_pre, test_data_dir, img_size, downsample_factor, batch_size=64, weight_path=None):
@@ -103,10 +90,9 @@ def PredictLabels_by_filename(model_for_pre, test_data_dir, img_size, downsample
         y_pred_length = np.full((l_ipb,), int(img_w//downsample_factor))
 
         # Decode 阶段 
-        # y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True) # 使用的是最简单的贪婪算法
-        # y_pred_labels_tensor = y_pred_labels_tensor_list[0]
-        # y_pred_labels = keras.backend.get_value(y_pred_labels_tensor) # 现在还是字符编码
-        y_pred_labels = decode_the_porb(y_pred_probMatrix, 10)
+        y_pred_labels_tensor_list, _ = keras.backend.ctc_decode(y_pred_probMatrix, y_pred_length, greedy=True) # 使用的是最简单的贪婪算法
+        y_pred_labels_tensor = y_pred_labels_tensor_list[0]
+        y_pred_labels = keras.backend.get_value(y_pred_labels_tensor) # 现在还是字符编码
         # 转换成字符串
         y_pred_text = ["" for _ in range(l_ipb)]
         for k in range(l_ipb):

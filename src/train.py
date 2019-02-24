@@ -29,8 +29,8 @@ def train_model(model, img_data_dir, train_txt, test_txt, weight_save_path, img_
 
     #callbacks  
     save_weights_cbk = keras.callbacks.ModelCheckpoint(weight_save_path, save_best_only=True, save_weights_only=True)
-    early_stop_cbk = keras.callbacks.EarlyStopping(patience=5)
-    reduce_lr_cbk = keras.callbacks.ReduceLROnPlateau(patience=5)
+    early_stop_cbk = keras.callbacks.EarlyStopping(patience=3)
+    reduce_lr_cbk = keras.callbacks.ReduceLROnPlateau(patience=3)
     
     # compile
     model.compile(optimizer='adam', loss={'ctc_loss_output': fake_ctc_loss})
@@ -41,7 +41,7 @@ def train_model(model, img_data_dir, train_txt, test_txt, weight_save_path, img_
                         steps_per_epoch=train_gen.img_number//batch_size,
                         validation_data=val_gen.get_data(),
                         validation_steps=val_gen.img_number//batch_size,
-                        callbacks=[save_weights_cbk, early_stop_cbk], 
+                        callbacks=[save_weights_cbk, early_stop_cbk, reduce_lr_cbk], 
                         epochs = epochs)
     print("Training finished!")
     return 0
