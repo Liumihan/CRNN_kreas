@@ -6,7 +6,7 @@
 
 其中src文件夹下面存储的是源码，data下面存储的是数据，predicted_results下面存的是当前在测试集上面的测试结果。
 
-在300w+的中文数据集上训练之后,得到了0.99的精度.
+在300w+的中文数据集上训练之后,得到了0.99的精度.(整个label都预测正确才认为正确)
 
 #### File Description
 
@@ -20,6 +20,8 @@
 | data_generator.py  | 数据生成函数，节省内存空间 |
 | dicts.py           | 字符字典                   |
 | utils.py           | 辅助函数                   |
+| predicted_results  | 一些预测的结果             |
+| trained_weights    | 训练好的模型               |
 
 
 
